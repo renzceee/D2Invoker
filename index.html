@@ -202,7 +202,7 @@
             display: flex; /* Use flexbox for centering */
             flex-direction: column; /* Arrange children vertically */
             justify-content: center; /* Center content vertically */
-            align-items: center; /* Center content horizontally */
+            align-items: center;
             width: 90%;
             max-width: 400px;
             color: #cbd5e0;
@@ -210,7 +210,7 @@
 
         .modal-content p {
             font-size: 1.1rem;
-            margin-bottom: 0; /* Remove margin-bottom to allow vertical centering */
+            margin-bottom: 0;
         }
         /* Style for the timer text when displayed externally */
         #timerDisplay {
@@ -366,8 +366,8 @@
 
         // Stores objects representing the R and T slots:
         let invokedSpellSlots = [
-            { slotHotkey: "R", spellName: "Skill 1", type: "default" },
-            { slotHotkey: "T", spellName: "Skill 2", type: "default" }
+            { slotHotkey: "R", spellName: "Skill 1", type: "default" }, // Default hotkey for the first invoked spell slot
+            { slotHotkey: "T", spellName: "Skill 2", type: "default" }  // Default hotkey for the second invoked spell slot
         ];
 
         // Function to shuffle an array (Fisher-Yates)
@@ -415,10 +415,14 @@
             gameState.targetSkill = null;
             gameState.targetSkillInvoked = false;
             orbQueue = [];
+            // Reset invoked spell slots to their original (or currently configured) state
+            // This ensures that remaps persist across game restarts if not explicitly cleared
+            // For this example, re-setting to the initial R and T as per the HTML data-key attributes.
             invokedSpellSlots = [
-                { slotHotkey: "R", spellName: "Skill 1", type: "default" },
-                { slotHotkey: "T", spellName: "Skill 2", type: "default" }
+                { slotHotkey: Array.from(skillBoxes).find(box => box.dataset.skillName === "Skill 1").dataset.key, spellName: "Skill 1", type: "default" },
+                { slotHotkey: Array.from(skillBoxes).find(box => box.dataset.skillName === "Skill 2").dataset.key, spellName: "Skill 2", type: "default" }
             ];
+
 
             // Select random unique skills for the game
             shuffleArray(allInvokableSpells);
@@ -487,24 +491,34 @@
 
         // Function to update the R and T skill box labels and data attributes
         function updateInvokedSpellDisplays() {
-            const rBox = Array.from(skillBoxes).find(box => box.dataset.key === "R");
-            const tBox = Array.from(skillBoxes).find(box => box.dataset.key === "T");
+            // Find the R and T boxes based on their data-skill-name
+            const rBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Skill 1");
+            const tBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Skill 2");
 
             if (rBox && invokedSpellSlots[0]) {
-                rBox.dataset.skillName = invokedSpellSlots[0].spellName;
+                // Update the data-key of the R box to match the current slotHotkey
+                rBox.dataset.key = invokedSpellSlots[0].slotHotkey;
+                rBox.querySelector('.skill-label').textContent = invokedSpellSlots[0].slotHotkey;
+
+                rBox.dataset.skillName = invokedSpellSlots[0].spellName; // Keep skill name updated
                 const rImg = rBox.querySelector('img');
                 const spellIcon = skillIconMap[invokedSpellSlots[0].spellName] || skillIconMap['Skill 1'];
                 rImg.src = spellIcon;
                 rImg.alt = invokedSpellSlots[0].spellName + " Icon";
             }
             if (tBox && invokedSpellSlots[1]) {
-                tBox.dataset.skillName = invokedSpellSlots[1].spellName;
+                // Update the data-key of the T box to match the current slotHotkey
+                tBox.dataset.key = invokedSpellSlots[1].slotHotkey;
+                tBox.querySelector('.skill-label').textContent = invokedSpellSlots[1].slotHotkey;
+
+                tBox.dataset.skillName = invokedSpellSlots[1].spellName; // Keep skill name updated
                 const tImg = tBox.querySelector('img');
                 const spellIcon = skillIconMap[invokedSpellSlots[1].spellName] || skillIconMap['Skill 2'];
                 tImg.src = spellIcon;
                 tImg.alt = invokedSpellSlots[1].spellName + " Icon";
             }
         }
+
 
         // Function to update initial visuals for Q, W, E, F skill boxes
         function updateAllSkillBoxVisuals() {
@@ -516,6 +530,8 @@
                     imgElement.alt = skillName + " Icon";
                 }
             });
+            // Ensure R and T labels are correctly displayed based on invokedSpellSlots initial values
+            updateInvokedSpellDisplays();
         }
 
         // Add click event listeners for main control buttons
@@ -532,13 +548,30 @@
             timerDisplay.classList.add('hidden'); // Hide the separate timer
             playButton.disabled = false;
             orbQueue = [];
+            // Reset invoked spell slots to their initial state (Q, W, E, R, T, F)
+            // This clears any remapped hotkeys for R and T slots.
+            const rBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Skill 1");
+            const tBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Skill 2");
+            const invokeBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Invoke");
+            const quasBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Quas");
+            const wexBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Wex");
+            const exortBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Exort");
+
+            if (rBox) { rBox.dataset.key = "R"; rBox.querySelector('.skill-label').textContent = "R"; }
+            if (tBox) { tBox.dataset.key = "T"; tBox.querySelector('.skill-label').textContent = "T"; }
+            if (invokeBox) { invokeBox.dataset.key = "F"; invokeBox.querySelector('.skill-label').textContent = "F"; }
+            if (quasBox) { quasBox.dataset.key = "Q"; quasBox.querySelector('.skill-label').textContent = "Q"; }
+            if (wexBox) { wexBox.dataset.key = "W"; wexBox.querySelector('.skill-label').textContent = "W"; }
+            if (exortBox) { exortBox.dataset.key = "E"; exortBox.querySelector('.skill-label').textContent = "E"; }
+
+
             invokedSpellSlots = [
                 { slotHotkey: "R", spellName: "Skill 1", type: "default" },
                 { slotHotkey: "T", spellName: "Skill 2", type: "default" }
             ];
             updateOrbCirclesDisplay();
             updateInvokedSpellDisplays();
-            updateAllSkillBoxVisuals();
+            updateAllSkillBoxVisuals(); // This will reset R and T labels
             if (controlModeActive) toggleControlMode(); // Exit controls mode if active
         });
 
@@ -570,7 +603,7 @@
                         addOrbToQueue(hotkey);
                     } else if (skillName === "Invoke") {
                         handleInvoke();
-                    } else if (hotkey === "R" || hotkey === "T") {
+                    } else if (skillName === "Skill 1" || skillName === "Skill 2") { // Check by skill name for R/T slots
                         handleCastSkill(hotkey);
                     }
                 }
@@ -626,7 +659,7 @@
                             addOrbToQueue(hotkey);
                         } else if (skillName === "Invoke") { // Check by skill name for invoke
                             handleInvoke();
-                        } else if (hotkey === "R" || hotkey === "T") { // Still hardcoded for R and T to avoid remapping issues
+                        } else if (skillName === "Skill 1" || skillName === "Skill 2") { // Check by skill name for R/T slots
                             handleCastSkill(hotkey);
                         }
                     }
@@ -792,26 +825,28 @@
             if (!currentHotkeyBox) return;
 
             const newKey = e.key.toUpperCase();
-
-            // Prevent R and T from being remapped as they are fixed spell slots
-            if (currentHotkeyBox.dataset.key === "R" || currentHotkeyBox.dataset.key === "T") {
-                showMessage(`The hotkey for ${currentHotkeyBox.dataset.skillName} (R/T) cannot be changed as they are fixed spell cast slots.`, true);
-                document.querySelector('.modal-overlay').remove();
-                currentHotkeyBox = null;
-                return;
-            }
+            // Capture the skill name before currentHotkeyBox might be nulled
+            const currentSkillName = currentHotkeyBox.dataset.skillName;
 
             // Allow only single alphanumeric keys (A-Z, 0-9)
             if (newKey.length === 1 && /[A-Z0-9]/.test(newKey)) {
                 if (isHotkeyDuplicate(newKey, currentHotkeyBox)) {
-                    const skillName = currentHotkeyBox.dataset.skillName;
-                    showMessage(`"${newKey}" is already assigned to another skill. Please choose a different key for ${skillName}.`, true);
+                    showMessage(`"${newKey}" is already assigned to another skill. Please choose a different key for ${currentSkillName}.`, true);
                 } else {
                     currentHotkeyBox.querySelector('.skill-label').textContent = newKey;
                     currentHotkeyBox.dataset.key = newKey; // Update the data-key attribute
+
+                    // If the remapped box is Skill 1 (R slot) or Skill 2 (T slot), update invokedSpellSlots
+                    if (currentSkillName === "Skill 1") {
+                        invokedSpellSlots[0].slotHotkey = newKey;
+                    } else if (currentSkillName === "Skill 2") {
+                        invokedSpellSlots[1].slotHotkey = newKey;
+                    }
+
                     document.querySelector('.modal-overlay').remove();
                     currentHotkeyBox = null; // Clear the reference
-                    showMessage(`Hotkey changed successfully to "${newKey}" for ${currentHotkeyBox.dataset.skillName}!`);
+                    // Removed the success toast notification here
+                    // showMessage(`Hotkey changed successfully to "${newKey}" for ${currentSkillName}!`);
                 }
             } else {
                 showMessage('Please press a single alphanumeric key.', true);
@@ -850,10 +885,10 @@
                 // Shift the current R slot spell to the T slot
                 // If T slot was previously a default skill, it gets overwritten.
                 // If it was an invoked skill, it gets pushed out.
-                invokedSpellSlots[1] = { ...invokedSpellSlots[0], slotHotkey: "T" };
+                invokedSpellSlots[1] = { ...invokedSpellSlots[0], slotHotkey: invokedSpellSlots[1].slotHotkey }; // Maintain T's current hotkey
 
                 // Place the newly invoked spell into the R slot
-                invokedSpellSlots[0] = { slotHotkey: "R", spellName: invokedSpellName, type: "invoked" };
+                invokedSpellSlots[0] = { slotHotkey: invokedSpellSlots[0].slotHotkey, spellName: invokedSpellName, type: "invoked" }; // Maintain R's current hotkey
                 
                 console.log(`Invoked ${invokedSpellName}! New skill in R, previous R in T.`);
                 showMessage(`Invoked: ${invokedSpellName}`);
@@ -873,35 +908,41 @@
 
         /**
          * Handles casting of skills from R or T slots.
-         * @param {string} hotkey - The hotkey pressed (R or T).
+         * @param {string} hotkey - The hotkey pressed that corresponds to an R or T slot.
          */
         function handleCastSkill(hotkey) {
             if (!gameState.isPlaying) return; // Only process if game is playing
 
-            // Determine which slot was activated
-            const activatedSlot = invokedSpellSlots.find(slot => slot.slotHotkey === hotkey);
+            // Determine which slot (0 for R, 1 for T) was activated based on the hotkey
+            const activatedSlotIndex = invokedSpellSlots.findIndex(slot => slot.slotHotkey === hotkey);
 
-            if (activatedSlot && activatedSlot.type === "invoked") { // Only cast if it's an invoked spell
-                console.log(`Casting skill: ${activatedSlot.spellName} from ${hotkey} slot!`);
-                showMessage(`Casted: ${activatedSlot.spellName}`);
+            if (activatedSlotIndex !== -1) {
+                const activatedSlot = invokedSpellSlots[activatedSlotIndex];
 
-                // Check if the cast skill matches the target skill for the game round
-                if (gameState.targetSkill && gameState.targetSkill.name === activatedSlot.spellName) {
-                    if (!gameState.targetSkillInvoked) {
-                        showMessage("Invoke the skill first before casting!", true);
-                        return; // Must invoke first, then cast
+                if (activatedSlot.type === "invoked") { // Only cast if it's an invoked spell
+                    console.log(`Casting skill: ${activatedSlot.spellName} from ${hotkey} slot!`);
+                    showMessage(`Casted: ${activatedSlot.spellName}`);
+
+                    // Check if the cast skill matches the target skill for the game round
+                    if (gameState.targetSkill && gameState.targetSkill.name === activatedSlot.spellName) {
+                        if (!gameState.targetSkillInvoked) {
+                            showMessage("Invoke the skill first before casting!", true);
+                            return; // Must invoke first, then cast
+                        }
+                        console.log(`Correctly invoked and casted ${gameState.targetSkill.name}!`);
+                        gameState.currentSkillIndex++; // Move to next skill
+                        orbQueue = []; // Clear orb queue for next skill
+                        updateOrbCirclesDisplay();
+                        displayNextSkill(); // Display the next skill or end game
+                    } else {
+                        showMessage("Wrong skill casted!", true);
                     }
-                    console.log(`Correctly invoked and casted ${gameState.targetSkill.name}!`);
-                    gameState.currentSkillIndex++; // Move to next skill
-                    orbQueue = []; // Clear orb queue for next skill
-                    updateOrbCirclesDisplay();
-                    displayNextSkill(); // Display the next skill or end game
-                } else {
-                    showMessage("Wrong skill casted!", true);
+                } else if (activatedSlot.type === "default") {
+                    // Default skills (Skill 1, Skill 2) cannot be cast in this game logic unless they're invoked spells
+                    showMessage("No spell to cast in this slot!", true);
                 }
-            } else if (activatedSlot && activatedSlot.type === "default") {
-                // Default skills (Skill 1, Skill 2) cannot be cast in this game logic
-                showMessage("No spell to cast in this slot!", true);
+            } else {
+                console.log(`No skill associated with hotkey: ${hotkey}`);
             }
         }
 
