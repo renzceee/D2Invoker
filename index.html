@@ -874,30 +874,40 @@
             if (invokedSpellData) {
                 const invokedSpellName = invokedSpellData.name;
 
-                // Check if the spell is already in the R slot (active spell)
-                if (invokedSpellSlots[0].spellName === invokedSpellName && invokedSpellSlots[0].type === "invoked") {
-                    console.log(`Attempted to re-invoke ${invokedSpellName}, but it's already in the R slot. Doing nothing.`);
+                // Check if the spell is already invoked and available in either R or T slot
+                const isInRSlot = invokedSpellSlots[0].spellName === invokedSpellName && invokedSpellSlots[0].type === "invoked";
+                const isInTSlot = invokedSpellSlots[1].spellName === invokedSpellName && invokedSpellSlots[1].type === "invoked";
+
+                if (isInRSlot || isInTSlot) {
+                    // It's important to use the actual hotkey from invokedSpellSlots for the log message,
+                    // as R and T are just conceptual names for slot 0 and 1 here.
+                    const currentSlotHotkey = isInRSlot ? invokedSpellSlots[0].slotHotkey : invokedSpellSlots[1].slotHotkey;
+                    console.log(`${invokedSpellName} is already in slot assigned to hotkey ${currentSlotHotkey}. Doing nothing.`);
                     return; // No change needed
                 }
 
-                // Shift the current R slot spell to the T slot
-                // If T slot was previously a default skill, it gets overwritten.
-                // If it was an invoked skill, it gets pushed out.
-                invokedSpellSlots[1] = { ...invokedSpellSlots[0], slotHotkey: invokedSpellSlots[1].slotHotkey }; // Maintain T's current hotkey
+                // If the spell is new (not currently in R or T as an invoked spell):
+                // The spell currently in R slot (invokedSpellSlots[0]) moves to T slot (invokedSpellSlots[1]).
+                // The hotkey for T slot (`invokedSpellSlots[1].slotHotkey`) is preserved.
+                // The spellName and type from R are copied to T.
+                invokedSpellSlots[1].spellName = invokedSpellSlots[0].spellName;
+                invokedSpellSlots[1].type = invokedSpellSlots[0].type;
 
-                // Place the newly invoked spell into the R slot
-                invokedSpellSlots[0] = { slotHotkey: invokedSpellSlots[0].slotHotkey, spellName: invokedSpellName, type: "invoked" }; // Maintain R's current hotkey
-                
-                console.log(`Invoked ${invokedSpellName}! New skill in R, previous R in T.`);
+                // The newly invoked spell goes into R slot (invokedSpellSlots[0]).
+                // The hotkey for R slot (`invokedSpellSlots[0].slotHotkey`) is preserved.
+                // The new spellName and type "invoked" are set for R.
+                invokedSpellSlots[0].spellName = invokedSpellName;
+                invokedSpellSlots[0].type = "invoked";
+
+                console.log(`Invoked ${invokedSpellName}! New spell in slot ${invokedSpellSlots[0].slotHotkey}, previous spell from ${invokedSpellSlots[0].slotHotkey} moved to slot ${invokedSpellSlots[1].slotHotkey}.`);
                 showMessage(`Invoked: ${invokedSpellName}`);
 
                 // Update the visual display of the R and T skill boxes
                 updateInvokedSpellDisplays();
-                
+
                 // If the invoked spell matches the target skill for the game round
                 if (gameState.targetSkill && gameState.targetSkill.name === invokedSpellName) {
                     gameState.targetSkillInvoked = true;
-                    // Proceed to casting the skill (handled by handleCastSkill if R is pressed next)
                 }
             } else {
                 showMessage("No spell found for this combination!", true);
