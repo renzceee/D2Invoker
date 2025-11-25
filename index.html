@@ -3,27 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Controls</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Invoker Trainer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: "Inter", sans-serif;
-            background-color: #1a202c; /* Dark background */
+            background-color: #1a202c;
             display: flex;
-            flex-direction: column; /* Arrange items vertically */
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            overflow: hidden; /* Prevent scrollbars */
+            overflow: hidden;
+            user-select: none; /* Prevent text selection while spamming keys */
         }
         .icon-button {
-            background-color: #4a5568; /* Slightly lighter gray */
-            color: #cbd5e0; /* Light text color */
-            border-radius: 9999px; /* Fully rounded */
+            background-color: #4a5568;
+            color: #cbd5e0;
+            border-radius: 9999px;
             padding: 1.5rem;
             display: flex;
             justify-content: center;
@@ -32,9 +31,10 @@
             cursor: pointer;
             transition: all 0.2s ease-in-out;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: none;
         }
         .icon-button:hover {
-            background-color: #6366f1; /* Indigo on hover */
+            background-color: #6366f1;
             color: #ffffff;
             transform: translateY(-3px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -45,310 +45,262 @@
         .icon-button:disabled {
             background-color: #2d3748;
             cursor: not-allowed;
-            opacity: 0.7;
+            opacity: 0.5;
+            transform: none;
+            box-shadow: none;
         }
 
-        /* Highlight for the controls button when active */
         #controlsButton.active {
-            background-color: #4f46e5; /* Darker indigo to show active state */
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.7), 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background-color: #4f46e5;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
         }
 
         .skill-box {
-            background-color: #2d3748; /* Darker gray for skill boxes */
-            border: 2px solid #4a5568; /* Border for definition */
-            border-radius: 0.5rem; /* Slightly rounded corners */
-            width: 5rem; /* Fixed width */
-            height: 5rem; /* Fixed height */
+            background-color: #2d3748;
+            border: 2px solid #4a5568;
+            border-radius: 0.5rem;
+            width: 5rem;
+            height: 5rem;
             margin: 0.5rem;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2); /* Inner shadow for depth */
-            position: relative; /* Needed for absolute positioning of children */
-            display: flex; /* Use flex to align content if any */
-            justify-content: center; /* Center content vertically */
-            align-items: center; /* Center content horizontally */
-            transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, transform 0.1s ease-in-out, background-color 0.1s ease-in-out; /* Added background-color transition */
-            text-align: center; /* Center text within the box */
-            font-size: 0.9rem; /* Slightly smaller font for skill names */
-            color: #cbd5e0; /* Default text color for skill names */
-            cursor: pointer; /* Indicate clickable */
-            overflow: hidden; /* Important to clip image inside rounded corners */
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            overflow: hidden;
         }
-        .skill-box:active { /* Visual feedback for clicking skill boxes */
-            transform: translateY(2px);
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
-        }
-        /* New class for keyboard press feedback */
+        
+        /* Visual feedback for key press */
         .skill-box.pressed {
-            background-color: #6366f1; /* Highlight color when pressed by keyboard */
-            transform: translateY(2px); /* Simulate a pressed state */
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3); /* Simulate a pressed state */
+            border-color: #6366f1;
+            transform: translateY(2px);
+            box-shadow: inset 0 0 15px rgba(99, 102, 241, 0.5);
         }
 
         .skill-box.highlight {
-            border-color: #6366f1; /* Highlight color */
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.7), inset 0 2px 4px rgba(0, 0, 0, 0.2); /* Glowing effect */
+            border-color: #f59e0b; /* Amber for edit mode */
+            animation: pulse 2s infinite;
         }
-        /* Image within skill boxes */
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
         .skill-box img {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Cover the entire box */
-            z-index: 0; /* Ensure image is behind the label */
-            border-radius: 0.5rem; /* Match parent border-radius */
+            object-fit: cover;
+            z-index: 0;
+            opacity: 0.8;
         }
 
         .skill-label {
             position: absolute;
-            top: 5px; /* Position to top */
-            left: 8px; /* Position to left */
-            transform: none; /* Remove transform for centering */
-            font-size: 0.875rem; /* Smaller font size (text-sm in Tailwind) */
-            font-weight: bold;
-            color: #a0aec0; /* Lighter gray text */
-            visibility: visible; /* Always visible by default */
-            z-index: 1; /* Ensure label is on top of image */
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.7); /* Add shadow for readability over image */
+            top: 2px;
+            left: 6px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #ffffff;
+            z-index: 1;
+            text-shadow: 2px 2px 0px #000;
+            background-color: rgba(0,0,0,0.5);
+            padding: 1px 6px;
+            border-radius: 4px;
         }
 
         .elongated-box {
-            background-color: #2d3748; /* Darker gray, similar to skill boxes */
+            background-color: #2d3748;
             border: 2px solid #4a5568;
             border-radius: 0.5rem;
-            width: 25rem;
-            max-width: 90vw; /* Responsive width */
-            height: 5rem;
-            margin-bottom: 2rem; /* Space below the box */
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+            width: 28rem;
+            max-width: 90vw;
+            height: 6rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             display: flex;
-            flex-direction: row; /* Changed to row for icon and text */
+            flex-direction: row;
             justify-content: center;
             align-items: center;
             color: #a0aec0;
-            font-size: 1.2rem;
-            font-weight: bold;
-            padding: 0.5rem; /* Add some padding */
+            padding: 0.5rem;
         }
         .elongated-box .target-skill-text {
-            font-size: 1.5rem; /* Larger font for the target skill */
+            font-size: 1.8rem;
             color: #ffffff;
-            margin-left: 0.5rem; /* Space between icon and text */
+            margin-left: 1rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
         .elongated-box .target-skill-icon {
-            width: 3.5rem; /* Size for the icon */
-            height: 3.5rem; /* Size for the icon */
-            border-radius: 0.25rem; /* Slightly rounded corners for the icon */
+            width: 4rem;
+            height: 4rem;
+            border-radius: 0.25rem;
             object-fit: cover;
+            border: 2px solid #6366f1;
         }
         .elongated-box .game-over-text {
-            font-size: 1.5rem; /* Consistent font size for game over text */
-            color: #ffffff;
-            text-align: center;
+            font-size: 2rem;
+            color: #4ade80; /* Green for success/time */
         }
 
-
-        /* Responsive adjustments for the elongated box */
-        @media (max-width: 640px) {
-            .elongated-box {
-                width: 90vw;
-                margin-left: 1rem;
-                margin-right: 1rem;
-            }
-        }
-
-        /* Small Circle Styles */
         .small-circle {
-            background-color: #2d3748; /* Darker gray, similar to other boxes */
+            background-color: #1a202c;
             border: 2px solid #4a5568;
-            border-radius: 50%; /* Make it a circle */
-            width: 2.5rem; /* Increased size */
-            height: 2.5rem; /* Increased size */
-            margin: 0 0.75rem; /* Slightly more space between circles */
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            margin: 0 0.5rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-shrink: 0; /* Prevent shrinking on smaller screens */
-            overflow: hidden; /* Ensure image doesn't overflow */
+            overflow: hidden;
+            transition: all 0.2s;
         }
         .small-circle img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Cover the circle area */
-            border-radius: 50%; /* Keep image circular */
+            object-fit: cover;
         }
 
-        /* Custom Modal Styles */
+        /* Modal Styles */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.85);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            backdrop-filter: blur(4px);
         }
 
         .modal-content {
             background-color: #2d3748;
-            padding: 2rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            display: flex; /* Use flexbox for centering */
-            flex-direction: column; /* Arrange children vertically */
-            justify-content: center; /* Center content vertically */
-            align-items: center;
-            width: 90%;
-            max-width: 400px;
-            color: #cbd5e0;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            border: 1px solid #4a5568;
+            text-align: center;
+            color: #ffffff;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        .modal-content p {
-            font-size: 1.1rem;
-            margin-bottom: 0;
-        }
-        /* Style for the timer text when displayed externally */
         #timerDisplay {
-            color: #ffffff;
-            font-size: 2rem;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            color: #fbbf24;
+            font-size: 2.5rem;
             font-weight: bold;
-            margin-top: 1rem;
-            margin-bottom: 1rem;
+            margin: 1rem 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
     </style>
 </head>
 <body>
-    <!-- Elongated Box -->
     <div class="elongated-box">
         <img id="targetSkillIcon" class="target-skill-icon hidden" src="" alt="Target Skill Icon">
         <span id="gameDisplayMessage" class="target-skill-text">Ready to Start!</span>
     </div>
 
-    <!-- Three Small Empty Circles Container -->
-    <div class="flex justify-center items-center mb-8 mt-4">
-        <div class="small-circle" id="skillCircleLeft"></div>
-        <div class="small-circle" id="skillCircleMiddle"></div>
-        <div class="small-circle" id="skillCircleRight"></div>
+    <div id="timerDisplay" class="hidden">00:00.00</div>
+
+    <div class="flex justify-center items-center mb-8 mt-2">
+        <div class="small-circle" id="orb1"></div>
+        <div class="small-circle" id="orb2"></div>
+        <div class="small-circle" id="orb3"></div>
     </div>
 
-    <!-- Skill/Control Boxes Container -->
-    <div id="skillBoxesContainer" class="flex flex-wrap justify-center mb-8 max-w-2xl">
-        <div class="skill-box" data-key="Q" data-skill-name="Quas">
+    <div id="skillBoxesContainer" class="flex flex-wrap justify-center mb-8 max-w-3xl">
+        <div class="skill-box" id="box-Q" data-key="Q" data-skill-name="Quas">
             <span class="skill-label">Q</span>
-            <img src="https://placehold.co/100x100/1a202c/cbd5e0?text=Q" alt="Quas Icon">
+            <img src="" alt="Quas">
         </div>
-        <div class="skill-box" data-key="W" data-skill-name="Wex">
+        <div class="skill-box" id="box-W" data-key="W" data-skill-name="Wex">
             <span class="skill-label">W</span>
-            <img src="https://placehold.co/100x100/1a202c/cbd5e0?text=W" alt="Wex Icon">
+            <img src="" alt="Wex">
         </div>
-        <div class="skill-box" data-key="E" data-skill-name="Exort">
+        <div class="skill-box" id="box-E" data-key="E" data-skill-name="Exort">
             <span class="skill-label">E</span>
-            <img src="https://placehold.co/100x100/1a202c/cbd5e0?text=E" alt="Exort Icon">
+            <img src="" alt="Exort">
         </div>
-        <div class="skill-box" data-key="R" data-skill-name="Skill 1">
-            <span class="skill-label">R</span>
-            <img src="https://placehold.co/100x100/1a202c/cbd5e0?text=R" alt="Skill 1 Icon">
-        </div>
-        <div class="skill-box" data-key="T" data-skill-name="Skill 2">
-            <span class="skill-label">T</span>
-            <img src="https://placehold.co/100x100/1a202c/cbd5e0?text=T" alt="Skill 2 Icon">
-        </div>
-        <div class="skill-box" data-key="F" data-skill-name="Invoke">
+        
+        <div class="skill-box" id="box-F" data-key="F" data-skill-name="Invoke">
             <span class="skill-label">F</span>
-            <img src="https://placehold.co/100x100/1a202c/cbd5e0?text=F" alt="Invoke Icon">
+            <img src="" alt="Invoke">
+        </div>
+
+        <div class="skill-box" id="box-R" data-key="R" data-skill-name="Skill 1">
+            <span class="skill-label">R</span>
+            <img src="" alt="Slot 1">
+        </div>
+        <div class="skill-box" id="box-T" data-key="T" data-skill-name="Skill 2">
+            <span class="skill-label">T</span>
+            <img src="" alt="Slot 2">
         </div>
     </div>
 
-    <!-- Play, Restart, Controls Buttons Container -->
     <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8 p-4">
-        <!-- Play Button -->
-        <button id="playButton" class="icon-button">
+        <button id="playButton" class="icon-button" title="Start Game">
             <i class="fas fa-play"></i>
         </button>
-
-        <!-- Restart Button -->
-        <button id="restartButton" class="icon-button">
+        <button id="restartButton" class="icon-button" title="Reset Game">
             <i class="fas fa-redo"></i>
         </button>
-
-        <!-- Controls Button -->
-        <button id="controlsButton" class="icon-button">
-            <i class="fas fa-sliders-h"></i>
+        <button id="controlsButton" class="icon-button" title="Remap Keys">
+            <i class="fas fa-keyboard"></i>
         </button>
     </div>
 
-    <!-- Timer Display -->
-    <div id="timerDisplay" class="text-white text-2xl font-bold mt-4 mb-4 hidden">00:00.00</div>
-
     <script>
-        // Get references to the buttons and display elements
-        const playButton = document.getElementById('playButton');
-        const restartButton = document.getElementById('restartButton');
-        const controlsButton = document.getElementById('controlsButton');
-        const skillBoxes = document.querySelectorAll('.skill-box');
-        const skillCircleLeft = document.getElementById('skillCircleLeft');
-        const skillCircleMiddle = document.getElementById('skillCircleMiddle');
-        const skillCircleRight = document.getElementById('skillCircleRight');
-        const skillCircles = [skillCircleLeft, skillCircleMiddle, skillCircleRight];
-        const gameDisplayMessage = document.getElementById('gameDisplayMessage');
-        const targetSkillIcon = document.getElementById('targetSkillIcon');
-        const timerDisplay = document.getElementById('timerDisplay');
-
-        let controlModeActive = false;
-        let currentHotkeyBox = null;
-        let orbQueue = [];
-        let timerInterval;
-
-        // Game state object
-        let gameState = {
-            isPlaying: false,
-            currentSkillIndex: 0,
-            skillsToInvoke: [],
-            startTime: 0,
-            endTime: 0,
-            targetSkill: null,
-            targetSkillInvoked: false,
-            totalSkillsInGame: 10
+        // --- Configuration & Assets ---
+        
+        // Using placeholders with colors so the game works without local files
+        const IMG_BASE = "https://placehold.co/150x150";
+        const COLORS = {
+            Q: "3b82f6", // Blue
+            W: "a855f7", // Purple
+            E: "f97316", // Orange
+            Invoke: "10b981", // Emerald
+            Slot: "2d3748", // Dark Gray
+            Text: "ffffff"
         };
 
-        // Define which skills contribute to the circle queue (Quas, Wex, Exort)
-        const ORB_SKILLS = ['Quas', 'Wex', 'Exort'];
-
-        // Orb image URLs for the small circles
-        const orbImages = {
-            "Q": "./icons/quas.png",
-            "W": "./icons/wex.png",
-            "E": "./icons/exort.png"
-        };
-
-        // Skill icon map for the main skill boxes (Q, W, E, R, T, F)
-        // These are the images that will appear behind the hotkey label
         const skillIconMap = {
-            "Quas": "./icons/quas.png",
-            "Wex": "./icons/wex.png",
-            "Exort": "./icons/exort.png",
-            "Skill 1": "./icons/empty.png", // Default R slot visual
-            "Skill 2": "./icons/empty.png", // Default T slot visual
-            "Invoke": "./icons/invoke.png",
-            // Actual Invoker Spell Icons (using placeholders with names for clarity)
-            "Cold Snap": "./icons/cold_snap.png",
-            "Ghost Walk": "./icons/ghost_walk.png",
-            "Ice Wall": "./icons/ice_wall.png",
-            "E.M.P.": "./icons/emp.png",
-            "Tornado": "./icons/tornado.png",
-            "Alacrity": "./icons/alacrity.png",
-            "Sun Strike": "./icons/sun_strike.png",
-            "Forge Spirit": "./icons/forge_spirit.png",
-            "Chaos Meteor": "./icons/chaos_meteor.png",
-            "Deafening Blast": "./icons/deafening_blast.png"
+            "Quas": `${IMG_BASE}/${COLORS.Q}/${COLORS.Text}?text=Quas`,
+            "Wex": `${IMG_BASE}/${COLORS.W}/${COLORS.Text}?text=Wex`,
+            "Exort": `${IMG_BASE}/${COLORS.E}/${COLORS.Text}?text=Exort`,
+            "Invoke": `${IMG_BASE}/${COLORS.Invoke}/${COLORS.Text}?text=Invoke`,
+            "Skill 1": `${IMG_BASE}/${COLORS.Slot}/718096?text=Empty`,
+            "Skill 2": `${IMG_BASE}/${COLORS.Slot}/718096?text=Empty`,
+            
+            // Spells (Using text on colored backgrounds for playable placeholders)
+            "Cold Snap": `${IMG_BASE}/0284c7/fff?text=Cold+Snap`,
+            "Ghost Walk": `${IMG_BASE}/6366f1/fff?text=Ghost+Walk`,
+            "Ice Wall": `${IMG_BASE}/0ea5e9/fff?text=Ice+Wall`,
+            "E.M.P.": `${IMG_BASE}/d946ef/fff?text=EMP`,
+            "Tornado": `${IMG_BASE}/8b5cf6/fff?text=Tornado`,
+            "Alacrity": `${IMG_BASE}/ec4899/fff?text=Alacrity`,
+            "Sun Strike": `${IMG_BASE}/ea580c/fff?text=Sun+Strike`,
+            "Forge Spirit": `${IMG_BASE}/f59e0b/fff?text=Forge+Spirit`,
+            "Chaos Meteor": `${IMG_BASE}/ef4444/fff?text=Chaos+Meteor`,
+            "Deafening Blast": `${IMG_BASE}/f43f5e/fff?text=Blast`
         };
 
-        // Define all possible invoked spells with their names and combinations
+        const orbImages = {
+            "Q": skillIconMap["Quas"],
+            "W": skillIconMap["Wex"],
+            "E": skillIconMap["Exort"]
+        };
+
         const allInvokableSpells = [
             { name: "Cold Snap", combination: "QQQ" },
             { name: "Ghost Walk", combination: "QQW" },
@@ -362,13 +314,363 @@
             { name: "Deafening Blast", combination: "EQW" }
         ];
 
-        // Stores objects representing the R and T slots:
+        // --- DOM Elements ---
+        const playButton = document.getElementById('playButton');
+        const restartButton = document.getElementById('restartButton');
+        const controlsButton = document.getElementById('controlsButton');
+        const skillBoxes = document.querySelectorAll('.skill-box');
+        
+        // Static references to specific boxes (Crucial for restart logic)
+        const boxR = document.getElementById('box-R');
+        const boxT = document.getElementById('box-T');
+
+        const orbCircles = [
+            document.getElementById('orb1'),
+            document.getElementById('orb2'),
+            document.getElementById('orb3')
+        ];
+        
+        const gameDisplayMessage = document.getElementById('gameDisplayMessage');
+        const targetSkillIcon = document.getElementById('targetSkillIcon');
+        const timerDisplay = document.getElementById('timerDisplay');
+
+        // --- State Variables ---
+        let controlModeActive = false;
+        let currentHotkeyBox = null;
+        let orbQueue = [];
+        let timerInterval;
+
+        // Stores state of the spell slots
+        // "default" means it's just a placeholder. "invoked" means a spell is ready.
         let invokedSpellSlots = [
-            { slotHotkey: "R", spellName: "Skill 1", type: "default" }, // Default hotkey for the first invoked spell slot
-            { slotHotkey: "T", spellName: "Skill 2", type: "default" }  // Default hotkey for the second invoked spell slot
+            { slotId: "box-R", spellName: "Skill 1", type: "default" }, 
+            { slotId: "box-T", spellName: "Skill 2", type: "default" }
         ];
 
-        // Function to shuffle an array (Fisher-Yates)
+        let gameState = {
+            isPlaying: false,
+            currentSkillIndex: 0,
+            skillsToInvoke: [],
+            startTime: 0,
+            endTime: 0,
+            targetSkill: null,
+            targetSkillInvoked: false,
+            totalSkillsInGame: 10
+        };
+
+        const ORB_SKILLS = ['Quas', 'Wex', 'Exort'];
+
+        // --- Initialization ---
+
+        function initVisuals() {
+            skillBoxes.forEach(box => {
+                const name = box.dataset.skillName;
+                const img = box.querySelector('img');
+                if(skillIconMap[name]) img.src = skillIconMap[name];
+            });
+        }
+        initVisuals(); // Run once on load
+
+        function initializeGame() {
+            gameState.isPlaying = true;
+            gameState.currentSkillIndex = 0;
+            gameState.startTime = Date.now();
+            gameState.endTime = 0;
+            gameState.targetSkill = null;
+            gameState.targetSkillInvoked = false;
+            orbQueue = [];
+            
+            // Hard Reset Slots to defaults
+            resetSpellSlots();
+
+            // Select random unique skills
+            shuffleArray(allInvokableSpells);
+            gameState.skillsToInvoke = allInvokableSpells.slice(0, gameState.totalSkillsInGame);
+
+            updateOrbCirclesDisplay();
+            updateInvokedSpellDisplays();
+            
+            startTimer();
+            displayNextSkill();
+            
+            playButton.disabled = true;
+            controlsButton.disabled = true; // Disable config during game
+            gameDisplayMessage.classList.remove('game-over-text');
+        }
+
+        function resetSpellSlots() {
+            // Reset Internal State
+            invokedSpellSlots[0] = { slotId: "box-R", spellName: "Skill 1", type: "default" };
+            invokedSpellSlots[1] = { slotId: "box-T", spellName: "Skill 2", type: "default" };
+            
+            // Reset DOM Attributes (Critical fix: using static ID references)
+            boxR.dataset.skillName = "Skill 1";
+            boxT.dataset.skillName = "Skill 2";
+        }
+
+        function resetGame() {
+            gameState.isPlaying = false;
+            stopTimer();
+            updateMainDisplayContent('ready');
+            timerDisplay.classList.add('hidden');
+            playButton.disabled = false;
+            controlsButton.disabled = false;
+            orbQueue = [];
+            
+            resetSpellSlots();
+            updateOrbCirclesDisplay();
+            updateInvokedSpellDisplays();
+            
+            if (controlModeActive) toggleControlMode();
+        }
+
+        // --- Core Logic ---
+
+        function displayNextSkill() {
+            if (gameState.currentSkillIndex < gameState.totalSkillsInGame) {
+                gameState.targetSkill = gameState.skillsToInvoke[gameState.currentSkillIndex];
+                updateMainDisplayContent('skill');
+                gameState.targetSkillInvoked = false;
+            } else {
+                finishGame();
+            }
+        }
+
+        function finishGame() {
+            gameState.isPlaying = false;
+            stopTimer();
+            updateMainDisplayContent('game_over');
+            playButton.disabled = false;
+            controlsButton.disabled = false;
+            // timerDisplay.classList.add('hidden'); // Keep timer visible at end
+        }
+
+        function handleInvoke() {
+            if (!gameState.isPlaying) return;
+
+            if (orbQueue.length !== 3) {
+                showMessage("Need 3 orbs!", true);
+                return;
+            }
+
+            // Calculate combination
+            let currentOrbCombination = orbQueue.slice().sort().join('');
+            let invokedSpellData = allInvokableSpells.find(spell => spell.combination === currentOrbCombination);
+
+            if (invokedSpellData) {
+                const invokedSpellName = invokedSpellData.name;
+
+                // Check if spell is already in Slot 1 (R) or Slot 2 (T)
+                const inSlot1 = invokedSpellSlots[0].spellName === invokedSpellName;
+                const inSlot2 = invokedSpellSlots[1].spellName === invokedSpellName;
+
+                if (inSlot1) return; // Already in primary slot, do nothing
+
+                // Shift Logic: Slot 1 moves to Slot 2
+                invokedSpellSlots[1].spellName = invokedSpellSlots[0].spellName;
+                invokedSpellSlots[1].type = invokedSpellSlots[0].type;
+
+                // New Spell goes to Slot 1
+                invokedSpellSlots[0].spellName = invokedSpellName;
+                invokedSpellSlots[0].type = "invoked";
+
+                updateInvokedSpellDisplays();
+
+                // Check against target
+                if (gameState.targetSkill && gameState.targetSkill.name === invokedSpellName) {
+                    gameState.targetSkillInvoked = true;
+                    // Visual feedback for success invoke
+                    showMessage(`Invoked: ${invokedSpellName}`);
+                }
+            } else {
+                showMessage("Invalid Combination!", true);
+            }
+        }
+
+        function handleCastSkill(boxElement) {
+            if (!gameState.isPlaying) return;
+
+            const slotIndex = (boxElement.id === "box-R") ? 0 : 1;
+            const slotData = invokedSpellSlots[slotIndex];
+
+            if (slotData.type === "invoked") {
+                // Logic: Does the casted spell match the required target?
+                // AND has the user invoked it properly? 
+                
+                // Note: Modified logic to be slightly more forgiving. 
+                // If the spell is correct, we accept it, provided they invoked it this round OR it was already there.
+                if (gameState.targetSkill && gameState.targetSkill.name === slotData.spellName) {
+                    
+                    // Success!
+                    showMessage(`Casted: ${slotData.spellName}`, false); // Green message
+                    gameState.currentSkillIndex++;
+                    orbQueue = []; // Reset orbs
+                    updateOrbCirclesDisplay();
+                    displayNextSkill();
+                } else {
+                    showMessage(`Wrong Spell! Needed: ${gameState.targetSkill.name}`, true);
+                }
+            } else {
+                showMessage("Empty Slot!", true);
+            }
+        }
+
+        // --- Visual Updates ---
+
+        function updateMainDisplayContent(type) {
+            targetSkillIcon.classList.add('hidden');
+            gameDisplayMessage.classList.remove('game-over-text');
+
+            if (type === 'skill' && gameState.targetSkill) {
+                targetSkillIcon.classList.remove('hidden');
+                targetSkillIcon.src = skillIconMap[gameState.targetSkill.name];
+                gameDisplayMessage.textContent = gameState.targetSkill.name;
+            } else if (type === 'game_over') {
+                const timeStr = timerDisplay.textContent;
+                gameDisplayMessage.textContent = `Completed: ${timeStr}`;
+                gameDisplayMessage.classList.add('game-over-text');
+            } else if (type === 'controls_mode') {
+                gameDisplayMessage.textContent = "Controls Mode - Click a box to remap";
+            } else if (type === 'ready') {
+                gameDisplayMessage.textContent = "Ready to Start!";
+            }
+        }
+
+        function updateOrbCirclesDisplay() {
+            // Clear all
+            orbCircles.forEach(circle => circle.innerHTML = '');
+            
+            // Render current queue
+            orbQueue.forEach((orbKey, index) => {
+                const img = document.createElement('img');
+                img.src = orbImages[orbKey];
+                // Append to circle. Queue index 0 is oldest (leftmost visually? Usually rightmost is newest)
+                // Let's standard layout: [Oldest] [Middle] [Newest]
+                if(index < 3) {
+                   orbCircles[index].appendChild(img); 
+                }
+            });
+        }
+
+        function updateInvokedSpellDisplays() {
+            invokedSpellSlots.forEach((slotData, index) => {
+                const box = document.getElementById(slotData.slotId);
+                const img = box.querySelector('img');
+                
+                // Update Image
+                img.src = skillIconMap[slotData.spellName] || skillIconMap["Skill " + (index+1)];
+                
+                // Update DOM Data (for reference)
+                box.dataset.skillName = slotData.spellName;
+            });
+        }
+
+        // --- Timer ---
+
+        function startTimer() {
+            timerDisplay.classList.remove('hidden');
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (gameState.isPlaying && !controlModeActive) {
+                    const elapsed = Date.now() - gameState.startTime;
+                    const mins = Math.floor(elapsed / 60000);
+                    const secs = Math.floor((elapsed % 60000) / 1000);
+                    const ms = Math.floor((elapsed % 1000) / 10);
+                    timerDisplay.textContent = `${pad(mins)}:${pad(secs)}.${pad(ms)}`;
+                }
+            }, 50);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function pad(n) {
+            return n.toString().padStart(2, '0');
+        }
+
+        // --- Input Handling & Events ---
+
+        playButton.addEventListener('click', initializeGame);
+        restartButton.addEventListener('click', resetGame);
+        
+        controlsButton.addEventListener('click', () => {
+            if (gameState.isPlaying) return; // Prevent changing during game
+            toggleControlMode();
+        });
+
+        // Click Handler for Skill Boxes
+        skillBoxes.forEach(box => {
+            box.addEventListener('click', () => {
+                if (controlModeActive) {
+                    currentHotkeyBox = box;
+                    showHotkeyModal(box.dataset.skillName);
+                    return;
+                }
+                
+                if (!gameState.isPlaying) return;
+
+                const key = box.dataset.key; // Get mapped hotkey
+                const name = box.dataset.skillName;
+                
+                executeAction(name, key, box);
+            });
+        });
+
+        // Global Keydown
+        document.body.addEventListener('keydown', (e) => {
+            if (document.querySelector('.modal-overlay')) {
+                handleModalInput(e);
+                return;
+            }
+
+            const pressedKey = e.key.toUpperCase();
+            
+            // Find box matching this key
+            let targetBox = null;
+            skillBoxes.forEach(box => {
+                if(box.dataset.key === pressedKey) targetBox = box;
+            });
+
+            if (targetBox) {
+                e.preventDefault();
+                targetBox.classList.add('pressed');
+                
+                if(controlModeActive) {
+                    currentHotkeyBox = targetBox;
+                    showHotkeyModal(targetBox.dataset.skillName);
+                } else if (gameState.isPlaying) {
+                    executeAction(targetBox.dataset.skillName, pressedKey, targetBox);
+                }
+            }
+        });
+
+        document.body.addEventListener('keyup', (e) => {
+            const pressedKey = e.key.toUpperCase();
+            skillBoxes.forEach(box => {
+                if(box.dataset.key === pressedKey) box.classList.remove('pressed');
+            });
+        });
+
+        function executeAction(name, key, boxElement) {
+            if (ORB_SKILLS.includes(name)) {
+                // It's a Q/W/E Orb
+                // Note: The box dataset name for Q/W/E never changes, so we can rely on 'name'
+                orbQueue.push(boxElement.dataset.key); // Push the Key (Q/W/E), not the full name
+                if (orbQueue.length > 3) orbQueue.shift();
+                updateOrbCirclesDisplay();
+            } 
+            else if (name === "Invoke") {
+                handleInvoke();
+            } 
+            else {
+                // It's a spell slot (R/T) or an invoked spell sitting in those slots
+                handleCastSkill(boxElement);
+            }
+        }
+
+        // --- Helpers ---
+
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -376,587 +678,89 @@
             }
         }
 
-        /**
-         * Updates the content of the main elongated display box.
-         * @param {string} type - 'skill', 'game_over', 'controls_mode', 'ready'.
-         */
-        function updateMainDisplayContent(type) {
-            targetSkillIcon.classList.add('hidden'); // Hide icon by default
-            gameDisplayMessage.classList.remove('game-over-text'); // Remove game over styling by default
+        function showMessage(msg, isError = false) {
+            // Remove existing toasts
+            const existing = document.querySelectorAll('.toast-msg');
+            existing.forEach(el => el.remove());
 
-            if (type === 'skill' && gameState.targetSkill) {
-                targetSkillIcon.classList.remove('hidden');
-                targetSkillIcon.src = skillIconMap[gameState.targetSkill.name] || '';
-                targetSkillIcon.alt = gameState.targetSkill.name + " Icon";
-                gameDisplayMessage.textContent = gameState.targetSkill.name;
-            } else if (type === 'game_over') {
-                const totalTime = gameState.endTime - gameState.startTime;
-                const minutes = Math.floor(totalTime / 60000);
-                const seconds = Math.floor((totalTime % 60000) / 1000);
-                const milliseconds = Math.floor((totalTime % 1000) / 10);
-                gameDisplayMessage.textContent = `Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
-                gameDisplayMessage.classList.add('game-over-text');
-            } else if (type === 'controls_mode') {
-                gameDisplayMessage.textContent = "Controls Mode - Game Paused";
-            } else if (type === 'ready') {
-                gameDisplayMessage.textContent = "Ready to Start!";
-            }
+            const div = document.createElement('div');
+            div.className = 'toast-msg';
+            div.style.cssText = `
+                position: fixed; bottom: 10%; left: 50%; transform: translateX(-50%);
+                background-color: ${isError ? '#ef4444' : '#10b981'};
+                color: white; padding: 12px 24px; border-radius: 8px;
+                font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 2000; animation: fadeUp 0.3s ease-out;
+            `;
+            div.textContent = msg;
+            document.body.appendChild(div);
+
+            setTimeout(() => {
+                div.style.opacity = '0';
+                div.style.transition = 'opacity 0.5s';
+                setTimeout(() => div.remove(), 500);
+            }, 1000); // Short duration for spamming
         }
 
+        // --- Controls / Remapping Logic ---
 
-        // Function to initialize or restart the game
-        function initializeGame() {
-            gameState.isPlaying = true;
-            gameState.currentSkillIndex = 0;
-            gameState.startTime = Date.now(); // Start time immediately
-            gameState.endTime = 0;
-            gameState.targetSkill = null;
-            gameState.targetSkillInvoked = false;
-            orbQueue = [];
-            // Reset invoked spell slots to their original (or currently configured) state
-            // This ensures that remaps persist across game restarts if not explicitly cleared
-            // For this example, re-setting to the initial R and T as per the HTML data-key attributes.
-            invokedSpellSlots = [
-                { slotHotkey: Array.from(skillBoxes).find(box => box.dataset.skillName === "Skill 1").dataset.key, spellName: "Skill 1", type: "default" },
-                { slotHotkey: Array.from(skillBoxes).find(box => box.dataset.skillName === "Skill 2").dataset.key, spellName: "Skill 2", type: "default" }
-            ];
-
-
-            // Select random unique skills for the game
-            shuffleArray(allInvokableSpells);
-            gameState.skillsToInvoke = allInvokableSpells.slice(0, gameState.totalSkillsInGame);
-
-            updateOrbCirclesDisplay();
-            updateInvokedSpellDisplays();
-            updateAllSkillBoxVisuals();
-            startTimer(); // Start external timer
-            displayNextSkill(); // Display first skill in main box
-            playButton.disabled = true;
-        }
-
-        // Function to display the next skill to invoke or end the game
-        function displayNextSkill() {
-            if (gameState.currentSkillIndex < gameState.totalSkillsInGame) {
-                gameState.targetSkill = gameState.skillsToInvoke[gameState.currentSkillIndex];
-                updateMainDisplayContent('skill'); // Show skill icon and name
-                gameState.targetSkillInvoked = false;
-            } else {
-                // Game finished
-                gameState.isPlaying = false;
-                stopTimer(); // Stop external timer
-                updateMainDisplayContent('game_over'); // Display final time in main box
-                playButton.disabled = false;
-                timerDisplay.classList.add('hidden'); // Hide the separate timer
-            }
-        }
-
-        // Function to start the game timer (external display)
-        function startTimer() {
-            timerDisplay.classList.remove('hidden'); // Make external timer visible
-
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                if (gameState.isPlaying && !controlModeActive) {
-                    const elapsedTime = Date.now() - gameState.startTime;
-                    const minutes = Math.floor(elapsedTime / 60000);
-                    const seconds = Math.floor((elapsedTime % 60000) / 1000);
-                    const milliseconds = Math.floor((elapsedTime % 1000) / 10);
-                    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
-                }
-            }, 100);
-        }
-
-        // Function to stop the game timer
-        function stopTimer() {
-            clearInterval(timerInterval);
-            gameState.endTime = Date.now(); // Record end time
-        }
-
-        // Function to update the display of the skill circles (right to left filling)
-        function updateOrbCirclesDisplay() {
-            skillCircles.forEach(circle => {
-                circle.innerHTML = '';
-            });
-
-            for (let i = 0; i < orbQueue.length; i++) {
-                const hotkey = orbQueue[i];
-                const img = document.createElement('img');
-                img.src = orbImages[hotkey] || '';
-                img.alt = hotkey;
-                skillCircles[2 - (orbQueue.length - 1 - i)].appendChild(img);
-            }
-        }
-
-        // Function to update the R and T skill box labels and data attributes
-        function updateInvokedSpellDisplays() {
-            // Find the R and T boxes based on their data-skill-name
-            const rBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Skill 1");
-            const tBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Skill 2");
-
-            if (rBox && invokedSpellSlots[0]) {
-                // Update the data-key of the R box to match the current slotHotkey
-                rBox.dataset.key = invokedSpellSlots[0].slotHotkey;
-                rBox.querySelector('.skill-label').textContent = invokedSpellSlots[0].slotHotkey;
-
-                rBox.dataset.skillName = invokedSpellSlots[0].spellName; // Keep skill name updated
-                const rImg = rBox.querySelector('img');
-                const spellIcon = skillIconMap[invokedSpellSlots[0].spellName] || skillIconMap['Skill 1'];
-                rImg.src = spellIcon;
-                rImg.alt = invokedSpellSlots[0].spellName + " Icon";
-            }
-            if (tBox && invokedSpellSlots[1]) {
-                // Update the data-key of the T box to match the current slotHotkey
-                tBox.dataset.key = invokedSpellSlots[1].slotHotkey;
-                tBox.querySelector('.skill-label').textContent = invokedSpellSlots[1].slotHotkey;
-
-                tBox.dataset.skillName = invokedSpellSlots[1].spellName; // Keep skill name updated
-                const tImg = tBox.querySelector('img');
-                const spellIcon = skillIconMap[invokedSpellSlots[1].spellName] || skillIconMap['Skill 2'];
-                tImg.src = spellIcon;
-                tImg.alt = invokedSpellSlots[1].spellName + " Icon";
-            }
-        }
-
-
-        // Function to update initial visuals for Q, W, E, F skill boxes
-        function updateAllSkillBoxVisuals() {
-            skillBoxes.forEach(box => {
-                const skillName = box.dataset.skillName;
-                const imgElement = box.querySelector('img');
-                if (imgElement) {
-                    imgElement.src = skillIconMap[skillName] || '';
-                    imgElement.alt = skillName + " Icon";
-                }
-            });
-            // Ensure R and T labels are correctly displayed based on invokedSpellSlots initial values
-            updateInvokedSpellDisplays();
-        }
-
-        // Add click event listeners for main control buttons
-        playButton.addEventListener('click', () => {
-            console.log('Play button clicked!');
-            initializeGame();
-        });
-
-        restartButton.addEventListener('click', () => {
-            console.log('Restart button clicked!');
-            gameState.isPlaying = false;
-            stopTimer(); // Ensure timer interval is cleared
-            updateMainDisplayContent('ready'); // Reset main display
-            timerDisplay.classList.add('hidden'); // Hide the separate timer
-            playButton.disabled = false;
-            orbQueue = [];
-            // Reset invoked spell slots to their initial state (Q, W, E, R, T, F)
-            // This clears any remapped hotkeys for R and T slots.
-            const rBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Skill 1");
-            const tBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Skill 2");
-            const invokeBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Invoke");
-            const quasBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Quas");
-            const wexBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Wex");
-            const exortBox = Array.from(skillBoxes).find(box => box.dataset.skillName === "Exort");
-
-            if (rBox) { rBox.dataset.key = "R"; rBox.querySelector('.skill-label').textContent = "R"; }
-            if (tBox) { tBox.dataset.key = "T"; tBox.querySelector('.skill-label').textContent = "T"; }
-            if (invokeBox) { invokeBox.dataset.key = "F"; invokeBox.querySelector('.skill-label').textContent = "F"; }
-            if (quasBox) { quasBox.dataset.key = "Q"; quasBox.querySelector('.skill-label').textContent = "Q"; }
-            if (wexBox) { wexBox.dataset.key = "W"; wexBox.querySelector('.skill-label').textContent = "W"; }
-            if (exortBox) { exortBox.dataset.key = "E"; exortBox.querySelector('.skill-label').textContent = "E"; }
-
-
-            invokedSpellSlots = [
-                { slotHotkey: "R", spellName: "Skill 1", type: "default" },
-                { slotHotkey: "T", spellName: "Skill 2", type: "default" }
-            ];
-            updateOrbCirclesDisplay();
-            updateInvokedSpellDisplays();
-            updateAllSkillBoxVisuals(); // This will reset R and T labels
-            if (controlModeActive) toggleControlMode(); // Exit controls mode if active
-        });
-
-        controlsButton.addEventListener('click', () => {
-            console.log('Controls button clicked!');
-            if (gameState.isPlaying && !controlModeActive) { // Entering controls mode
-                clearInterval(timerInterval); // Pause timer updates
-                timerDisplay.classList.add('hidden'); // Hide external timer
-                updateMainDisplayContent('controls_mode'); // Show controls mode message
-            } else if (gameState.isPlaying && controlModeActive) { // Exiting controls mode, resume
-                startTimer(); // Resume external timer updates
-                updateMainDisplayContent('skill'); // Show current skill
-            }
-            toggleControlMode();
-        });
-
-        // Add click event listeners for skill boxes
-        skillBoxes.forEach(box => {
-            box.addEventListener('click', () => {
-                const hotkey = box.dataset.key;
-                const skillName = box.dataset.skillName;
-
-                if (controlModeActive) {
-                    currentHotkeyBox = box;
-                    showHotkeyModal(skillName);
-                } else if (gameState.isPlaying) {
-                    console.log(`Mouse clicked: Activating skill: ${skillName} (Hotkey: ${hotkey})!`);
-                    if (ORB_SKILLS.includes(skillName)) {
-                        addOrbToQueue(hotkey);
-                    } else if (skillName === "Invoke") {
-                        handleInvoke();
-                    } else if (skillName === "Skill 1" || skillName === "Skill 2") { // Check by skill name for R/T slots
-                        handleCastSkill(hotkey);
-                    }
-                }
-            });
-        });
-
-        /**
-         * Adds an orb hotkey to the orb queue and updates the display.
-         * @param {string} hotkey - The hotkey character of the orb (e.g., Q, W, E).
-         */
-        function addOrbToQueue(hotkey) {
-            orbQueue.push(hotkey);
-            if (orbQueue.length > 3) {
-                orbQueue.shift();
-            }
-            updateOrbCirclesDisplay();
-        }
-
-        /**
-         * Handles global keydown events for hotkey remapping and skill activation.
-         * @param {KeyboardEvent} e - The keyboard event.
-         */
-        document.body.addEventListener('keydown', (e) => {
-            const pressedKey = e.key.toUpperCase();
-
-            if (document.querySelector('.modal-overlay')) {
-                handleHotkeyKeydownModal(e);
-                return;
-            }
-
-            if (gameState.isPlaying && !controlModeActive) {
-                let foundSkillBox = null;
-                // Find the skill box that matches the pressed key
-                skillBoxes.forEach(box => {
-                    if (box.dataset.key === pressedKey) {
-                        foundSkillBox = box;
-                    }
-                });
-
-                if (foundSkillBox) {
-                    e.preventDefault(); // Prevent default browser actions for these keys
-
-                    const skillName = foundSkillBox.dataset.skillName;
-                    const hotkey = foundSkillBox.dataset.key;
-
-                    console.log(`Keyboard pressed: Activating skill: ${skillName} (Hotkey: ${hotkey})!`);
-
-                    // Add visual feedback for key press
-                    if (!foundSkillBox.classList.contains('pressed')) {
-                        foundSkillBox.classList.add('pressed');
-
-                        if (ORB_SKILLS.includes(skillName)) {
-                            addOrbToQueue(hotkey);
-                        } else if (skillName === "Invoke") { // Check by skill name for invoke
-                            handleInvoke();
-                        } else if (skillName === "Skill 1" || skillName === "Skill 2") { // Check by skill name for R/T slots
-                            handleCastSkill(hotkey);
-                        }
-                    }
-                }
-            } else if (!gameState.isPlaying && controlModeActive) {
-                // In controls mode, any skill box key press will trigger remapping
-                let foundSkillBox = null;
-                skillBoxes.forEach(box => {
-                    if (box.dataset.key === pressedKey) {
-                        foundSkillBox = box;
-                    }
-                });
-                if (foundSkillBox) {
-                    e.preventDefault();
-                    currentHotkeyBox = foundSkillBox;
-                    showHotkeyModal(foundSkillBox.dataset.skillName);
-                }
-            }
-        });
-
-        /**
-         * Handles global keyup events to remove the 'pressed' state.
-         * @param {KeyboardEvent} e - The keyboard event.
-         */
-        document.body.addEventListener('keyup', (e) => {
-            const releasedKey = e.key.toUpperCase();
-
-            // Do not remove 'pressed' class if a modal is open (key was for modal input)
-            if (document.querySelector('.modal-overlay')) {
-                return;
-            }
-
-            // Only remove 'pressed' class if not in control mode
-            // In control mode, the 'pressed' state is not used for visual feedback.
-            if (!controlModeActive) {
-                skillBoxes.forEach(box => {
-                    if (box.dataset.key === releasedKey) {
-                        box.classList.remove('pressed');
-                    }
-                });
-            }
-        });
-
-        /**
-         * Toggles the control mode. In control mode, skill boxes are highlighted,
-         * and interaction with them allows hotkey remapping.
-         */
         function toggleControlMode() {
             controlModeActive = !controlModeActive;
             controlsButton.classList.toggle('active', controlModeActive);
-
-            skillBoxes.forEach(box => {
-                box.classList.toggle('highlight', controlModeActive);
-            });
-
-            if (controlModeActive) {
-                // Disable play button when in control mode
+            
+            skillBoxes.forEach(box => box.classList.toggle('highlight', controlModeActive));
+            
+            if(controlModeActive) {
+                updateMainDisplayContent('controls_mode');
                 playButton.disabled = true;
-                // If game is playing, pause timer and update display
-                if (gameState.isPlaying) {
-                    clearInterval(timerInterval); // Pause timer updates
-                    timerDisplay.classList.add('hidden'); // Hide external timer
-                    updateMainDisplayContent('controls_mode');
-                } else {
-                    // If game is not playing, ensure display reflects controls mode
-                    updateMainDisplayContent('controls_mode');
-                }
             } else {
-                // Enable play button when exiting control mode, if game is not active
-                if (!gameState.isPlaying) {
-                    playButton.disabled = false;
-                    updateMainDisplayContent('ready'); // Reset main display to ready
-                } else {
-                    // If game was playing, resume timer and display
-                    startTimer();
-                    updateMainDisplayContent('skill');
-                }
+                updateMainDisplayContent('ready');
+                playButton.disabled = false;
             }
         }
 
-        /**
-         * Displays a modal to prompt the user to press a new hotkey.
-         * @param {string} skillName - The name of the skill being remapped.
-         */
         function showHotkeyModal(skillName) {
-            const existingModal = document.querySelector('.modal-overlay');
-            if (existingModal) existingModal.remove();
-
-            const modalOverlay = document.createElement('div');
-            modalOverlay.classList.add('modal-overlay');
-
-            const modalContent = document.createElement('div');
-            modalContent.classList.add('modal-content');
-
-            const message = document.createElement('p');
-            message.textContent = `Press a new key for ${skillName}...`;
-            modalContent.appendChild(message);
-
-            modalOverlay.appendChild(modalContent);
-            document.body.appendChild(modalOverlay);
-        }
-
-        /**
-         * Displays a temporary message to the user, typically for errors or confirmations.
-         * @param {string} msg - The message to display.
-         * @param {boolean} isError - True if it's an error message, applies different styling.
-         */
-        function showMessage(msg, isError = false) {
-            const messageBox = document.createElement('div');
-            messageBox.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background-color: ${isError ? '#ef4444' : '#22c55e'}; /* red for error, green for success */
-                color: white;
-                padding: 10px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-                z-index: 1001;
-                opacity: 0;
-                transition: opacity 0.3s ease-in-out;
-                font-size: 1rem;
-                font-weight: bold;
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal-content">
+                    <h2 class="text-xl font-bold mb-4">Remap Key</h2>
+                    <p class="mb-4 text-gray-300">Press new key for <strong>${skillName}</strong></p>
+                    <div class="animate-bounce text-2xl">⌨️</div>
+                </div>
             `;
-            messageBox.textContent = msg;
-            document.body.appendChild(messageBox);
-
-            // Fade in
-            setTimeout(() => {
-                messageBox.style.opacity = '1';
-            }, 50);
-
-            // Fade out and remove after a delay
-            setTimeout(() => {
-                messageBox.style.opacity = '0';
-                messageBox.addEventListener('transitionend', () => messageBox.remove());
-            }, 3000);
+            document.body.appendChild(overlay);
         }
 
-        /**
-         * Checks if a new hotkey is already assigned to another skill box.
-         * @param {string} newKey - The proposed new hotkey.
-         * @param {HTMLElement} excludeBox - The skill box currently being remapped.
-         * @returns {boolean} True if the key is a duplicate, false otherwise.
-         */
-        function isHotkeyDuplicate(newKey, excludeBox) {
-            let isDuplicate = false;
-            skillBoxes.forEach(box => {
-                // Check if the hotkey matches and it's not the box being currently remapped
-                if (box !== excludeBox && box.dataset.key === newKey) {
-                    isDuplicate = true;
-                }
-            });
-            return isDuplicate;
-        }
-
-        /**
-         * Handles keydown events specifically for hotkey remapping within the modal.
-         * @param {KeyboardEvent} e - The keyboard event.
-         */
-        function handleHotkeyKeydownModal(e) {
-            if (!currentHotkeyBox) return;
-
+        function handleModalInput(e) {
             const newKey = e.key.toUpperCase();
-            // Capture the skill name before currentHotkeyBox might be nulled
-            const currentSkillName = currentHotkeyBox.dataset.skillName;
+            if (/[A-Z0-9]/.test(newKey) && newKey.length === 1) {
+                // Check duplicate
+                let duplicate = false;
+                skillBoxes.forEach(box => {
+                     if(box !== currentHotkeyBox && box.dataset.key === newKey) duplicate = true;
+                });
 
-            // Allow only single alphanumeric keys (A-Z, 0-9)
-            if (newKey.length === 1 && /[A-Z0-9]/.test(newKey)) {
-                if (isHotkeyDuplicate(newKey, currentHotkeyBox)) {
-                    showMessage(`"${newKey}" is already assigned to another skill. Please choose a different key for ${currentSkillName}.`, true);
+                if(duplicate) {
+                    showMessage(`Key "${newKey}" is already used!`, true);
                 } else {
+                    currentHotkeyBox.dataset.key = newKey;
                     currentHotkeyBox.querySelector('.skill-label').textContent = newKey;
-                    currentHotkeyBox.dataset.key = newKey; // Update the data-key attribute
-
-                    // If the remapped box is Skill 1 (R slot) or Skill 2 (T slot), update invokedSpellSlots
-                    if (currentSkillName === "Skill 1") {
-                        invokedSpellSlots[0].slotHotkey = newKey;
-                    } else if (currentSkillName === "Skill 2") {
-                        invokedSpellSlots[1].slotHotkey = newKey;
-                    }
-
                     document.querySelector('.modal-overlay').remove();
-                    currentHotkeyBox = null; // Clear the reference
-                    // Removed the success toast notification here
-                    // showMessage(`Hotkey changed successfully to "${newKey}" for ${currentSkillName}!`);
+                    currentHotkeyBox = null;
                 }
-            } else {
-                showMessage('Please press a single alphanumeric key.', true);
             }
         }
 
-        /**
-         * Handles the Invoke logic when the 'Invoke' hotkey/button is activated.
-         */
-        function handleInvoke() {
-            if (!gameState.isPlaying) return; // Only process if game is playing
-
-            // Invoke requires exactly 3 orbs
-            if (orbQueue.length !== 3) {
-                showMessage("Need 3 orbs to Invoke!", true);
-                return;
+        // Add CSS animation for toast
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes fadeUp {
+                from { opacity: 0; transform: translate(-50%, 20px); }
+                to { opacity: 1; transform: translate(-50%, 0); }
             }
-
-            // Create a sorted combination string from the current orb queue
-            let currentOrbCombination = orbQueue.slice().sort().join('');
-            console.log("Attempting to invoke. Current Orb Combination (sorted):", currentOrbCombination);
-
-            // Find the spell that matches the current orb combination
-            let invokedSpellData = allInvokableSpells.find(spell => spell.combination === currentOrbCombination);
-            console.log("Found invokedSpellData:", invokedSpellData ? invokedSpellData.name : "None Found");
-
-            if (invokedSpellData) {
-                const invokedSpellName = invokedSpellData.name;
-
-                // Check if the spell is already invoked and available in either R or T slot
-                const isInRSlot = invokedSpellSlots[0].spellName === invokedSpellName && invokedSpellSlots[0].type === "invoked";
-                const isInTSlot = invokedSpellSlots[1].spellName === invokedSpellName && invokedSpellSlots[1].type === "invoked";
-
-                if (isInRSlot || isInTSlot) {
-                    // It's important to use the actual hotkey from invokedSpellSlots for the log message,
-                    // as R and T are just conceptual names for slot 0 and 1 here.
-                    const currentSlotHotkey = isInRSlot ? invokedSpellSlots[0].slotHotkey : invokedSpellSlots[1].slotHotkey;
-                    console.log(`${invokedSpellName} is already in slot assigned to hotkey ${currentSlotHotkey}. Doing nothing.`);
-                    return; // No change needed
-                }
-
-                // If the spell is new (not currently in R or T as an invoked spell):
-                // The spell currently in R slot (invokedSpellSlots[0]) moves to T slot (invokedSpellSlots[1]).
-                // The hotkey for T slot (`invokedSpellSlots[1].slotHotkey`) is preserved.
-                // The spellName and type from R are copied to T.
-                invokedSpellSlots[1].spellName = invokedSpellSlots[0].spellName;
-                invokedSpellSlots[1].type = invokedSpellSlots[0].type;
-
-                // The newly invoked spell goes into R slot (invokedSpellSlots[0]).
-                // The hotkey for R slot (`invokedSpellSlots[0].slotHotkey`) is preserved.
-                // The new spellName and type "invoked" are set for R.
-                invokedSpellSlots[0].spellName = invokedSpellName;
-                invokedSpellSlots[0].type = "invoked";
-
-                console.log(`Invoked ${invokedSpellName}! New spell in slot ${invokedSpellSlots[0].slotHotkey}, previous spell from ${invokedSpellSlots[0].slotHotkey} moved to slot ${invokedSpellSlots[1].slotHotkey}.`);
-                showMessage(`Invoked: ${invokedSpellName}`);
-
-                // Update the visual display of the R and T skill boxes
-                updateInvokedSpellDisplays();
-
-                // If the invoked spell matches the target skill for the game round
-                if (gameState.targetSkill && gameState.targetSkill.name === invokedSpellName) {
-                    gameState.targetSkillInvoked = true;
-                }
-            } else {
-                showMessage("No spell found for this combination!", true);
-            }
-        }
-
-        /**
-         * Handles casting of skills from R or T slots.
-         * @param {string} hotkey - The hotkey pressed that corresponds to an R or T slot.
-         */
-        function handleCastSkill(hotkey) {
-            if (!gameState.isPlaying) return; // Only process if game is playing
-
-            // Determine which slot (0 for R, 1 for T) was activated based on the hotkey
-            const activatedSlotIndex = invokedSpellSlots.findIndex(slot => slot.slotHotkey === hotkey);
-
-            if (activatedSlotIndex !== -1) {
-                const activatedSlot = invokedSpellSlots[activatedSlotIndex];
-
-                if (activatedSlot.type === "invoked") { // Only cast if it's an invoked spell
-                    console.log(`Casting skill: ${activatedSlot.spellName} from ${hotkey} slot!`);
-                    showMessage(`Casted: ${activatedSlot.spellName}`);
-
-                    // Check if the cast skill matches the target skill for the game round
-                    if (gameState.targetSkill && gameState.targetSkill.name === activatedSlot.spellName) {
-                        if (!gameState.targetSkillInvoked) {
-                            showMessage("Invoke the skill first before casting!", true);
-                            return; // Must invoke first, then cast
-                        }
-                        console.log(`Correctly invoked and casted ${gameState.targetSkill.name}!`);
-                        gameState.currentSkillIndex++; // Move to next skill
-                        orbQueue = []; // Clear orb queue for next skill
-                        updateOrbCirclesDisplay();
-                        displayNextSkill(); // Display the next skill or end game
-                    } else {
-                        showMessage("Wrong skill casted!", true);
-                    }
-                } else if (activatedSlot.type === "default") {
-                    // Default skills (Skill 1, Skill 2) cannot be cast in this game logic unless they're invoked spells
-                    showMessage("No spell to cast in this slot!", true);
-                }
-            } else {
-                console.log(`No skill associated with hotkey: ${hotkey}`);
-            }
-        }
-
-        // Initial setup on page load
-        updateAllSkillBoxVisuals(); // Ensure initial icons are set for all boxes
-        updateMainDisplayContent('ready'); // Set initial main display message
+        `;
+        document.head.appendChild(styleSheet);
 
     </script>
 </body>
