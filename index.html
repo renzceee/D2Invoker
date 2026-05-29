@@ -263,36 +263,24 @@
     <script>
         // --- Configuration & Assets ---
         
-        // Using placeholders with colors so the game works without local files
-        const IMG_BASE = "https://placehold.co/150x150";
-        const COLORS = {
-            Q: "3b82f6", // Blue
-            W: "a855f7", // Purple
-            E: "f97316", // Orange
-            Invoke: "10b981", // Emerald
-            Slot: "2d3748", // Dark Gray
-            Text: "ffffff"
-        };
-
         const skillIconMap = {
-            "Quas": `${IMG_BASE}/${COLORS.Q}/${COLORS.Text}?text=Quas`,
-            "Wex": `${IMG_BASE}/${COLORS.W}/${COLORS.Text}?text=Wex`,
-            "Exort": `${IMG_BASE}/${COLORS.E}/${COLORS.Text}?text=Exort`,
-            "Invoke": `${IMG_BASE}/${COLORS.Invoke}/${COLORS.Text}?text=Invoke`,
-            "Skill 1": `${IMG_BASE}/${COLORS.Slot}/718096?text=Empty`,
-            "Skill 2": `${IMG_BASE}/${COLORS.Slot}/718096?text=Empty`,
+            "Quas": "icons/quas.png",
+            "Wex": "icons/wex.png",
+            "Exort": "icons/exort.png",
+            "Invoke": "icons/invoke.png",
+            "Skill 1": "icons/empty.png",
+            "Skill 2": "icons/empty.png",
             
-            // Spells (Using text on colored backgrounds for playable placeholders)
-            "Cold Snap": `${IMG_BASE}/0284c7/fff?text=Cold+Snap`,
-            "Ghost Walk": `${IMG_BASE}/6366f1/fff?text=Ghost+Walk`,
-            "Ice Wall": `${IMG_BASE}/0ea5e9/fff?text=Ice+Wall`,
-            "E.M.P.": `${IMG_BASE}/d946ef/fff?text=EMP`,
-            "Tornado": `${IMG_BASE}/8b5cf6/fff?text=Tornado`,
-            "Alacrity": `${IMG_BASE}/ec4899/fff?text=Alacrity`,
-            "Sun Strike": `${IMG_BASE}/ea580c/fff?text=Sun+Strike`,
-            "Forge Spirit": `${IMG_BASE}/f59e0b/fff?text=Forge+Spirit`,
-            "Chaos Meteor": `${IMG_BASE}/ef4444/fff?text=Chaos+Meteor`,
-            "Deafening Blast": `${IMG_BASE}/f43f5e/fff?text=Blast`
+            "Cold Snap": "icons/cold_snap.png",
+            "Ghost Walk": "icons/ghost_walk.png",
+            "Ice Wall": "icons/ice_wall.png",
+            "E.M.P.": "icons/emp.png",
+            "Tornado": "icons/tornado.png",
+            "Alacrity": "icons/alacrity.png",
+            "Sun Strike": "icons/sun_strike.png",
+            "Forge Spirit": "icons/forge_spirit.png",
+            "Chaos Meteor": "icons/chaos_meteor.png",
+            "Deafening Blast": "icons/deafening_blast.png"
         };
 
         const orbImages = {
