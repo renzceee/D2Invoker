@@ -6,6 +6,21 @@
     <title>Invoker Trainer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="preload" as="image" href="icons/quas.png">
+    <link rel="preload" as="image" href="icons/wex.png">
+    <link rel="preload" as="image" href="icons/exort.png">
+    <link rel="preload" as="image" href="icons/invoke.png">
+    <link rel="preload" as="image" href="icons/empty.png">
+    <link rel="preload" as="image" href="icons/cold_snap.png">
+    <link rel="preload" as="image" href="icons/ghost_walk.png">
+    <link rel="preload" as="image" href="icons/ice_wall.png">
+    <link rel="preload" as="image" href="icons/emp.png">
+    <link rel="preload" as="image" href="icons/tornado.png">
+    <link rel="preload" as="image" href="icons/alacrity.png">
+    <link rel="preload" as="image" href="icons/sun_strike.png">
+    <link rel="preload" as="image" href="icons/forge_spirit.png">
+    <link rel="preload" as="image" href="icons/chaos_meteor.png">
+    <link rel="preload" as="image" href="icons/deafening_blast.png">
     <style>
         body {
             font-family: "Inter", sans-serif;
@@ -288,6 +303,18 @@
             "W": skillIconMap["Wex"],
             "E": skillIconMap["Exort"]
         };
+
+        const preloadedIconImages = {};
+
+        function preloadSkillIcons() {
+            [...new Set(Object.values(skillIconMap))].forEach(src => {
+                const img = new Image();
+                img.src = src;
+                preloadedIconImages[src] = img;
+            });
+        }
+
+        preloadSkillIcons();
 
         const allInvokableSpells = [
             { name: "Cold Snap", combination: "QQQ" },
